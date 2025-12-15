@@ -1,5 +1,6 @@
 package com.KayraAtalay.dto.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,10 +14,11 @@ public class DtoCargoIU {
     @NotNull
     private String receiverName;
 
+    @NotNull
+    @Email
     private String receiverEmail;
 
+    @NotNull
     private String receiverAddress;
-
-    private BigDecimal price;
 
 }

@@ -26,6 +26,9 @@ public class Cargo extends BaseEntity {
     @Column(name = "receiver_name")
     private String receiverName;
 
+    @Column(name = "receiver_email")
+    private String receiverEmail;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private CargoStatus status;
