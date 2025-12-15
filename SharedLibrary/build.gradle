@@ -1,0 +1,38 @@
+plugins {
+    id 'java-library'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+
+
+dependencies {
+    // Web & Validation
+    api libs.springBootStarterWeb
+    api libs.springBootStarterValidation
+
+    // Security
+
+    api libs.springBootStarterSecurity
+
+    // Data JPA
+    api libs.springBootStarterDataJpa
+
+    // JWT
+    api libs.jjwtApi
+    runtimeOnly libs.jjwtImpl
+    runtimeOnly libs.jjwtJackson
+
+    // Lombok
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+}
+
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
