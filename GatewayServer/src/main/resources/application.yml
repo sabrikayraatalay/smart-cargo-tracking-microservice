@@ -12,6 +12,10 @@ spring:
           predicates:
             - Path=/dev/v1/logi-track-auth/** # for everything begins with /auth
 
+        - id: cargo-service
+          uri: lb://CARGO-SERVICE  # lb = Load Balancer (go for name in the eureka)
+          predicates:
+            - Path=/dev/v1/logi-track-cargo/** # for everything begins with /cargo
 eureka:
   client:
     service-url:

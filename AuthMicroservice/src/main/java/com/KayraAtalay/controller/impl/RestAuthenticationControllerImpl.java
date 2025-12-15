@@ -34,6 +34,13 @@ public class RestAuthenticationControllerImpl extends RestBaseController impleme
         return ok(authenticationService.register(request));
     }
 
+    @PostMapping(REGISTER_COURIER)
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public RootEntity<DtoUser> registerCourier(@Valid @RequestBody AuthRequest request) {
+        return ok(authenticationService.registerCourier(request));
+    }
+
     @PostMapping(AUTHENTICATE)
     @Override
     public RootEntity<AuthResponse> authenticate(@Valid @RequestBody AuthRequest request) {

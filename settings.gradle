@@ -1,1 +1,6 @@
 rootProject.name = 'LogiTrack'
+include 'SharedLibrary'
+include 'DiscoveryServer'
+include 'GatewayServer'
+include 'AuthMicroservice'
+include 'CargoMicroservice'

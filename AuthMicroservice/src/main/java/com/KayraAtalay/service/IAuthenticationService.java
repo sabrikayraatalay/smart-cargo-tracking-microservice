@@ -10,6 +10,8 @@ public interface IAuthenticationService {
 
     public DtoUser register(AuthRequest request);
 
+    public DtoUser registerCourier(AuthRequest request);
+
     public AuthResponse authenticate(AuthRequest request);
 
     public AuthResponse refreshToken(RefreshTokenRequest request);

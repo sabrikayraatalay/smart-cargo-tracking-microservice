@@ -11,7 +11,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/LogiAuthDB
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 
 eureka:

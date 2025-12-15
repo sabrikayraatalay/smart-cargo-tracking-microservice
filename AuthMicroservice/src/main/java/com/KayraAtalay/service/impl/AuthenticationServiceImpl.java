@@ -48,6 +48,16 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private RefreshTokenRepository refreshTokenRepository;
 
 
+    private User createCourier(AuthRequest request) {
+
+        User user = new User();
+        user.setCreateTime(new Date());
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(UserRole.COURIER);
+
+        return user;
+    }
 
 
     private User createUser(AuthRequest request) {
@@ -81,6 +91,22 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
 
         User savedUser = userRepository.save(createUser(request));
+        DtoUser dtoUser = new DtoUser();
+        BeanUtils.copyProperties(savedUser, dtoUser);
+
+
+        return dtoUser;
+    }
+
+    @Override
+    public DtoUser registerCourier(AuthRequest request) {
+        Optional<User> optional = userRepository.findByUsername(request.getUsername());
+
+        if (optional.isPresent()) {
+            throw new BaseException(new ErrorMessage(MessageType.USERNAME_ALREADY_EXISTS, request.getUsername()));
+        }
+
+        User savedUser = userRepository.save(createCourier(request));
         DtoUser dtoUser = new DtoUser();
         BeanUtils.copyProperties(savedUser, dtoUser);
 

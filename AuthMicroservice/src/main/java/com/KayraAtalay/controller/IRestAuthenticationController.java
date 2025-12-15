@@ -12,6 +12,8 @@ public interface IRestAuthenticationController {
 
     public RootEntity<DtoUser> register(AuthRequest request);
 
+    public RootEntity<DtoUser> registerCourier(AuthRequest request);
+
     public RootEntity<AuthResponse> authenticate(AuthRequest request);
 
     public RootEntity<AuthResponse> refreshToken(RefreshTokenRequest request);

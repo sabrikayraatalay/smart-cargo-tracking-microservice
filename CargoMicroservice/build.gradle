@@ -1,0 +1,13 @@
+dependencies {
+
+    implementation project(':SharedLibrary')
+    implementation libs.postgresql
+    implementation libs.lombok
+    annotationProcessor libs.lombok
+    implementation libs.swagger
+    implementation libs.springCloudStarterEurekaClient
+    implementation libs.springBootStarterWeb
+    implementation libs.springBootStarterAmqp
+    implementation libs.springCloudStarterOpenFeign
+
+}

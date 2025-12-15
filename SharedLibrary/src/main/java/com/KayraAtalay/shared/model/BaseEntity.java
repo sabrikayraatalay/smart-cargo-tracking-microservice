@@ -3,6 +3,7 @@ package com.KayraAtalay.shared.model;
 import java.util.Date;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -31,5 +32,9 @@ public class BaseEntity {
     @DateTimeFormat(iso = ISO.DATE_TIME)
     @CreatedDate
     private Date createTime;
+
+    @Column(name = "update_time")
+    @LastModifiedDate
+    private Date updateTime;
 
 }
