@@ -10,12 +10,16 @@ import com.KayraAtalay.model.Cargo;
 import com.KayraAtalay.repository.CargoRepository;
 import com.KayraAtalay.service.ICargoService;
 import com.KayraAtalay.shared.dto.NotificationMessage;
+import com.KayraAtalay.shared.exception.BaseException;
+import com.KayraAtalay.shared.exception.ErrorMessage;
+import com.KayraAtalay.shared.exception.MessageType;
 import com.KayraAtalay.utils.DtoConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,17 +38,20 @@ public class CargoServiceImpl implements ICargoService {
         return "TR-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
-    private Integer generateDeliveryCode() {
+    private Integer generateDeliveryCodeOrCreatedCode() {
         return ThreadLocalRandom.current().nextInt(1000, 10000);
     }
 
-    private Cargo createCargo(DtoCargoIU request, Long userId) {
+
+
+    private Cargo createCargo(DtoCargoIU request) {
         return Cargo.builder()
-                .deliveryCode(generateDeliveryCode())
+                .deliveryCode(generateDeliveryCodeOrCreatedCode())
                 .receiverName(request.getReceiverName())
                 .senderId(findUserId())
                 .status(CargoStatus.CREATED)
                 .trackingNumber(generateTrackingNumber())
+                .createdCode(generateDeliveryCodeOrCreatedCode()) //added for user,they will say this code to admin and they accept it
                 .build();
     }
 
@@ -66,29 +73,66 @@ public class CargoServiceImpl implements ICargoService {
 
     @Override
     public DtoCargo saveCargo(DtoCargoIU request) {
-         Long userId = findUserId();
 
-       Cargo cargo = createCargo(request, userId);
-       sendNotificationToQueue(cargo);
+       Cargo cargo = createCargo(request);
 
        Cargo savedCargo = cargoRepository.save(cargo);
 
-       return DtoConverter.toDtoCargo(cargo);
+       return DtoConverter.toDtoCargo(savedCargo);
 
     }
 
     @Override
     public DtoCargo updateCargoStatus(UpdateStatusRequest request) {
-        return null;
+        CargoStatus cargoStatus = request.getCargoStatus();
+
+        if(cargoStatus.equals(CargoStatus.DELIVERED)){
+            throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
+                    "Can not update status to delivered from department"));
+        }
+
+        String trackingNumber = request.getTrackingNumber();
+        Optional<Cargo> cargo = cargoRepository.findByTrackingNumber(trackingNumber);
+
+        if(cargo.isEmpty()) {
+            throw new BaseException(new ErrorMessage(MessageType.CARGO_NOT_FOUND, trackingNumber));
+        }
+        cargo.get().setStatus(cargoStatus);
+        Cargo savedCargo = cargoRepository.save(cargo.get());
+
+        return DtoConverter.toDtoCargo(savedCargo);
+
+    }
+
+    @Override
+    public DtoCargo deliverCargo(Long cargoId, Integer deliveryCode) {
+        boolean cargoExists = cargoRepository.existsByIdAndDeliveryCode(cargoId, deliveryCode);
+        if (!cargoExists) {
+            throw new BaseException(new ErrorMessage(MessageType.CARGO_NOT_FOUND, cargoId.toString()));
+        }
+
+        Cargo cargo = cargoRepository.findById(cargoId).get();
+
+        cargo.setStatus(CargoStatus.DELIVERED);
+        Cargo savedCargo = cargoRepository.save(cargo);
+
+        return DtoConverter.toDtoCargo(savedCargo);
     }
 
     @Override
     public DtoCargo findByTrackingNumber(String trackingNumber) {
-        return null;
+        Optional<Cargo> cargo = cargoRepository.findByTrackingNumber(trackingNumber);
+        if(cargo.isEmpty()) {
+            throw new BaseException(new ErrorMessage(MessageType.CARGO_NOT_FOUND, trackingNumber));
+        }
+
+        return DtoConverter.toDtoCargo(cargo.get());
     }
 
     @Override
     public List<DtoCargo> getCargosBySenderId(Long senderId) {
+
+
         return List.of();
     }
 }

@@ -13,6 +13,9 @@ public interface ICargoService {
     //(Just Courier ve Admin)
     DtoCargo updateCargoStatus(UpdateStatusRequest request);
 
+    //Just Courier
+    DtoCargo deliverCargo(Long cargoId ,Integer deliveryCode);
+
     //Public
     DtoCargo findByTrackingNumber(String trackingNumber);
 

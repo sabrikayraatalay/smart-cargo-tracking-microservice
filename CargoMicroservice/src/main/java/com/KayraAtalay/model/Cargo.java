@@ -20,6 +20,9 @@ public class Cargo extends BaseEntity {
     @Column(name = "delivery_code", nullable = false)
     private Integer deliveryCode;
 
+    @Column(name = "created_code",  nullable = false)
+    private Integer createdCode;
+
     @Column(name = "sender_id", nullable = false)
     private Long senderId;
 
