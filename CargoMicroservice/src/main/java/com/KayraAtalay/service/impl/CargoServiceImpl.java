@@ -1,6 +1,7 @@
 package com.KayraAtalay.service.impl;
 
 import com.KayraAtalay.config.RabbitMQConfig;
+import com.KayraAtalay.dto.request.AcceptAndDeliverRequest;
 import com.KayraAtalay.dto.request.DtoCargoIU;
 import com.KayraAtalay.dto.request.UpdateStatusRequest;
 import com.KayraAtalay.dto.response.DtoCargo;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +34,9 @@ public class CargoServiceImpl implements ICargoService {
 
     private Long findUserId(){
        return userManager.findUserIdByUsername().getPayload();
+    }
+    private String findUserEmail(){
+        return userManager.findUserEmailByUsername().getPayload();
     }
 
     private String generateTrackingNumber() {
@@ -48,21 +53,40 @@ public class CargoServiceImpl implements ICargoService {
         return Cargo.builder()
                 .deliveryCode(generateDeliveryCodeOrCreatedCode())
                 .receiverName(request.getReceiverName())
+                .receiverEmail(request.getReceiverEmail())
+                .deliveryAddress(request.getDeliveryAddress())
                 .senderId(findUserId())
+                .senderEmail(findUserEmail())
                 .status(CargoStatus.CREATED)
                 .trackingNumber(generateTrackingNumber())
                 .createdCode(generateDeliveryCodeOrCreatedCode()) //added for user,they will say this code to admin and they accept it
                 .build();
     }
 
-    private void sendNotificationToQueue(Cargo cargo) {
+    private void sendNotificationToQueueForCreatedCode(Cargo cargo, String messageType) {
+        NotificationMessage message = new NotificationMessage();
+        message.setTrackingNumber(cargo.getTrackingNumber());
+        message.setReceiverEmail(cargo.getSenderEmail());
+        message.setReceiverName(cargo.getReceiverName());
+        message.setDeliveryCode(cargo.getDeliveryCode());
+
+        message.setMessageType(messageType);
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_NAME,
+                RabbitMQConfig.ROUTING_KEY,
+                message
+        );
+    }
+
+    private void sendNotificationToQueue(Cargo cargo, String messageType) {
         NotificationMessage message = new NotificationMessage();
         message.setTrackingNumber(cargo.getTrackingNumber());
         message.setReceiverEmail(cargo.getReceiverEmail());
         message.setReceiverName(cargo.getReceiverName());
         message.setDeliveryCode(cargo.getDeliveryCode());
-        message.setMessageType("CARGO_CREATED");
 
+        message.setMessageType(messageType);
 
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.EXCHANGE_NAME,
@@ -77,19 +101,48 @@ public class CargoServiceImpl implements ICargoService {
        Cargo cargo = createCargo(request);
 
        Cargo savedCargo = cargoRepository.save(cargo);
+       sendNotificationToQueueForCreatedCode(savedCargo, "CARGO_CREATED");
 
        return DtoConverter.toDtoCargo(savedCargo);
 
     }
 
     @Override
+    public DtoCargo cancelCargo(Long cargoId) {
+        Long senderId = findUserId();
+        boolean isExists = cargoRepository.existsByIdAndSenderId(cargoId, senderId );
+
+        if (!isExists) {
+            throw new BaseException(new ErrorMessage(MessageType.CARGO_NOT_FOUND, cargoId.toString()));
+        }
+        Optional<Cargo> optCargo = cargoRepository.findById(cargoId);
+
+        if (optCargo.isEmpty()) {
+            throw new BaseException(new ErrorMessage(MessageType.CARGO_NOT_FOUND, cargoId.toString()));
+        }
+
+        Cargo cargo = optCargo.get();
+
+        if (cargo.getStatus() != CargoStatus.CREATED || cargo.getStatus() == CargoStatus.CANCELLED) {
+            throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
+                    "You can not cancel this cargo. This cargo is " + cargo.getStatus()));
+        }
+
+        cargo.setStatus(CargoStatus.CANCELLED);
+        Cargo savedCargo = cargoRepository.save(cargo);
+
+        return DtoConverter.toDtoCargo(savedCargo);
+    }
+
+    @Override
     public DtoCargo updateCargoStatus(UpdateStatusRequest request) {
         CargoStatus cargoStatus = request.getCargoStatus();
 
-        if(cargoStatus.equals(CargoStatus.DELIVERED)){
+        if(cargoStatus.equals(CargoStatus.DELIVERED ) || request.getCargoStatus().equals(CargoStatus.RECEIVED) ){
             throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,
-                    "Can not update status to delivered from department"));
+                    "Can not update status that you want from this function"));
         }
+
 
         String trackingNumber = request.getTrackingNumber();
         Optional<Cargo> cargo = cargoRepository.findByTrackingNumber(trackingNumber);
@@ -105,16 +158,44 @@ public class CargoServiceImpl implements ICargoService {
     }
 
     @Override
-    public DtoCargo deliverCargo(Long cargoId, Integer deliveryCode) {
-        boolean cargoExists = cargoRepository.existsByIdAndDeliveryCode(cargoId, deliveryCode);
-        if (!cargoExists) {
-            throw new BaseException(new ErrorMessage(MessageType.CARGO_NOT_FOUND, cargoId.toString()));
+    public DtoCargo acceptCargo(AcceptAndDeliverRequest acceptAndDeliverRequest) {
+        String trackingNumber = acceptAndDeliverRequest.getTrackingNumber();
+        Integer deliveryCode = acceptAndDeliverRequest.getDeliveryOrCreatedCode();
+
+        boolean isExists = cargoRepository.existsByTrackingNumberAndCreatedCode(trackingNumber, deliveryCode);
+        if(!isExists){
+            throw new BaseException(new ErrorMessage(MessageType.CARGO_NOT_FOUND, "can not find a cargo with given informations"));
         }
 
-        Cargo cargo = cargoRepository.findById(cargoId).get();
+        Cargo cargo = cargoRepository.findByTrackingNumber(trackingNumber).get();
+
+        cargo.setStatus(CargoStatus.RECEIVED);
+
+        Cargo savedCargo = cargoRepository.save(cargo);
+        sendNotificationToQueue(savedCargo,"Cargo_RECEIVED");
+
+        return DtoConverter.toDtoCargo(savedCargo);
+
+    }
+
+    @Override
+    public DtoCargo deliverCargo(AcceptAndDeliverRequest acceptAndDeliverRequest) {
+
+        String trackingNumber = acceptAndDeliverRequest.getTrackingNumber();
+        Integer deliveryCode = acceptAndDeliverRequest.getDeliveryOrCreatedCode();
+
+        boolean isExists = cargoRepository.existsByTrackingNumberAndDeliveryCode(trackingNumber, deliveryCode);
+
+        if (!isExists) {
+            throw new BaseException(new ErrorMessage(MessageType.CARGO_NOT_FOUND, "Wrong Tracking Number or Delivery Code"));
+        }
+        Cargo cargo = cargoRepository.findByTrackingNumber(trackingNumber).get();
+
 
         cargo.setStatus(CargoStatus.DELIVERED);
         Cargo savedCargo = cargoRepository.save(cargo);
+
+        sendNotificationToQueue(savedCargo,"Cargo_DELIVERED");
 
         return DtoConverter.toDtoCargo(savedCargo);
     }
@@ -130,9 +211,9 @@ public class CargoServiceImpl implements ICargoService {
     }
 
     @Override
-    public List<DtoCargo> getCargosBySenderId(Long senderId) {
+    public List<DtoCargo> getCargosBySenderId() {
+         List<Cargo> cargos = cargoRepository.findAllBySenderId(findUserId());
 
-
-        return List.of();
+        return cargos.stream().map(DtoConverter::toDtoCargo).collect(Collectors.toList());
     }
 }

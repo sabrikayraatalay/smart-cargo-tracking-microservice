@@ -1,5 +1,6 @@
 package com.KayraAtalay.service;
 
+import com.KayraAtalay.dto.request.AcceptAndDeliverRequest;
 import com.KayraAtalay.dto.request.DtoCargoIU;
 import com.KayraAtalay.dto.request.UpdateStatusRequest;
 import com.KayraAtalay.dto.response.DtoCargo;
@@ -7,19 +8,25 @@ import java.util.List;
 
 public interface ICargoService {
 
-    //(Just User)
-    DtoCargo saveCargo(DtoCargoIU request);
+    //User
+   public DtoCargo saveCargo(DtoCargoIU request);
 
-    //(Just Courier ve Admin)
-    DtoCargo updateCargoStatus(UpdateStatusRequest request);
+   //User
+   public DtoCargo cancelCargo(Long cargoId);
+
+    //Admin
+    public  DtoCargo updateCargoStatus(UpdateStatusRequest request);
+
+    //Just admin
+    public DtoCargo acceptCargo(AcceptAndDeliverRequest acceptAndDeliverRequest);
 
     //Just Courier
-    DtoCargo deliverCargo(Long cargoId ,Integer deliveryCode);
+    public  DtoCargo deliverCargo(AcceptAndDeliverRequest acceptAndDeliverRequest);
 
     //Public
-    DtoCargo findByTrackingNumber(String trackingNumber);
+    public DtoCargo findByTrackingNumber(String trackingNumber);
 
     //(Just User)
-    List<DtoCargo> getCargosBySenderId(Long senderId);
+    public List<DtoCargo> getCargosBySenderId();
 
 }

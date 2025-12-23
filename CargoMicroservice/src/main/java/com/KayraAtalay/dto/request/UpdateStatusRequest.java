@@ -10,6 +10,8 @@ public class UpdateStatusRequest {
 
     private String trackingNumber;
 
+    private Integer createdCode;
+
     private CargoStatus cargoStatus;
 
 }

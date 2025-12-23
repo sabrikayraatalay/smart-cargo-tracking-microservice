@@ -63,6 +63,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private User createUser(AuthRequest request) {
 
         User user = new User();
+        user.setEmail(request.getEmail());
         user.setCreateTime(new Date());
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -85,9 +86,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public DtoUser register(AuthRequest request) {
 
         Optional<User> optional = userRepository.findByUsername(request.getUsername());
+        Optional<User> optEmail = userRepository.findByEmail(request.getEmail());
 
         if (optional.isPresent()) {
-            throw new BaseException(new ErrorMessage(MessageType.USERNAME_ALREADY_EXISTS, request.getUsername()));
+            throw new BaseException(new ErrorMessage(MessageType.USER_ALREADY_EXISTS, request.getUsername()));
+        }
+
+        if (optEmail.isPresent()) {
+            throw new BaseException(new ErrorMessage(MessageType.USER_ALREADY_EXISTS, request.getEmail()));
         }
 
         User savedUser = userRepository.save(createUser(request));
@@ -103,7 +109,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         Optional<User> optional = userRepository.findByUsername(request.getUsername());
 
         if (optional.isPresent()) {
-            throw new BaseException(new ErrorMessage(MessageType.USERNAME_ALREADY_EXISTS, request.getUsername()));
+            throw new BaseException(new ErrorMessage(MessageType.USER_ALREADY_EXISTS, request.getUsername()));
         }
 
         User savedUser = userRepository.save(createCourier(request));
@@ -165,9 +171,21 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         Optional<User> optUser = userRepository.findByUsername(username);
 
         if(optUser.isEmpty()) {
-            throw new BaseException(new ErrorMessage(MessageType.USERNAME_NOT_FOUND, username));
+            throw new BaseException(new ErrorMessage(MessageType.USER_NOT_FOUND, username));
         }
         return optUser.get().getId();
     }
+
+    @Override
+    public String findUserEmailByUsername(String username) {
+        Optional<User> optUser = userRepository.findByUsername(username);
+
+        if(optUser.isEmpty()) {
+            throw new BaseException(new ErrorMessage(MessageType.USER_NOT_FOUND, username));
+        }
+        return optUser.get().getEmail();
+    }
+
+
 
 }

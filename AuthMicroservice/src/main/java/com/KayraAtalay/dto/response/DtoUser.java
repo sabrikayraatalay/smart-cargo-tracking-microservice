@@ -14,4 +14,6 @@ public class DtoUser extends DtoBase {
 
     private String username;
 
+    private String email;
+
 }

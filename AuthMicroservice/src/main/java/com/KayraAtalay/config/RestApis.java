@@ -11,4 +11,6 @@ public class RestApis {
     public static final String AUTHENTICATE = "/authenticate";
     public static final String REFRESH_TOKEN = "/refresh-token";
     public static final String FIND_USER_ID_BY_USERNAME = "/find-user-id-by-username";
+    public static final String FIND_USER_EMAIL_BY_USERNAME = "/find-user-email-by-username";
 }
+

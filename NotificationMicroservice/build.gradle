@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':SharedLibrary')
+    implementation 'org.springframework.boot:spring-boot-starter-amqp' // RabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // to send mail
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

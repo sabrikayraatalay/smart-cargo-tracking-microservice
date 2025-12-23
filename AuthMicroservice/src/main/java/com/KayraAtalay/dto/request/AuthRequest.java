@@ -1,6 +1,7 @@
 package com.KayraAtalay.dto.request;
 
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -20,10 +21,15 @@ public class AuthRequest {
     @Pattern(regexp = "^[a-zA-Z0-9._-]+$", message = "Username can only contain letters, numbers, underscores, dots, and hyphens")
     private String username;
 
+    @Email
+    private String email;
+
     @NotBlank(message = "Password cannot be empty or just spaces")
     @Size(min = 8, max = 50, message = "Password must be between 8 and 50 characters")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$",
             message = "Password must contain at least one uppercase letter, one lowercase letter, and one digit")
     private String password;
+
+
 
 }

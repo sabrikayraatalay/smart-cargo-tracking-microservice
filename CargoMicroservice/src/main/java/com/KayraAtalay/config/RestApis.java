@@ -6,11 +6,14 @@ public class RestApis {
     public static final String VERSIONS = "/v1";
     public static final String CARGO = DEVELOPER + VERSIONS + "/logi-track-cargo";
 
-    public static final String REGISTER = "/register";
-    public static final String REGISTER_COURIER = "/register-courier";
-    public static final String AUTHENTICATE = "/authenticate";
-    public static final String REFRESH_TOKEN = "/refresh-token";
-    public static final String FIND_USER_ID_BY_USERNAME = "/find-user-id-by-username";
+    public static final String SAVE_CARGO = "/create-cargo";
+    public static final String CANCEL_CARGO = "/cancel-cargo{cargoId}";
+    public static final String UPDATE_CARGO_STATUS = "/update-cargo-status";
+    public static final String ACCEPT_CARGO = "/accept-cargo";
+    public static final String DELIVER_CARGO = "/deliver-cargo";
+    public static final String FIND_CARGO_BY_TRACKING_NUMBER = "/find-cargo-by-tracking-number";
+    public static final String FIND_USER_CARGOS = "/find-user-cargos";
+
 }
 
 

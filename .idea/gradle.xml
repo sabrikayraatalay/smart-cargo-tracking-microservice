@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/CargoMicroservice" />
             <option value="$PROJECT_DIR$/DiscoveryServer" />
             <option value="$PROJECT_DIR$/GatewayServer" />
+            <option value="$PROJECT_DIR$/NotificationMicroservice" />
             <option value="$PROJECT_DIR$/SharedLibrary" />
           </set>
         </option>

@@ -36,6 +36,7 @@ ext {
 
             //rabbitMQ dependency
             springBootStarterAmqp             : "org.springframework.boot:spring-boot-starter-amqp",
+            springBootStarterMail : "org.springframework.boot:spring-boot-starter-mail",
 
 
             postgresql                        : "org.postgresql:postgresql:${versions.postgresql}",

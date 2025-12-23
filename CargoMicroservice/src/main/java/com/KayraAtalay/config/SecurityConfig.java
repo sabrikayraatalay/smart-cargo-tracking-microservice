@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import static com.KayraAtalay.config.RestApis.*;
 
 @Configuration
 @EnableWebSecurity
@@ -28,6 +29,10 @@ public class SecurityConfig {
             "/swagger-ui.html"
     };
 
+    private static final String[] PUBLIC_METHODS = {
+        CARGO + FIND_CARGO_BY_TRACKING_NUMBER
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -36,6 +41,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
+                        .requestMatchers(PUBLIC_METHODS).permitAll()
                         .anyRequest().authenticated()
                 )
 

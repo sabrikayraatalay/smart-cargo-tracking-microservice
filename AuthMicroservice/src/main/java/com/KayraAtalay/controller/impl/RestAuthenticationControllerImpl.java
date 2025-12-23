@@ -62,5 +62,14 @@ public class RestAuthenticationControllerImpl extends RestBaseController impleme
         return ok(authenticationService.findUserIdByUsername(username));
     }
 
+    @GetMapping(FIND_USER_EMAIL_BY_USERNAME)
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    @Hidden
+    public RootEntity<String> findUserEmailByUsername(Principal principal) {
+        String username = principal.getName();
+        return ok(authenticationService.findUserEmailByUsername(username));
+    }
+
 
 }

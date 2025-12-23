@@ -18,4 +18,6 @@ public interface IAuthenticationService {
 
     public Long findUserIdByUsername(String username);
 
+    public String findUserEmailByUsername(String email);
+
 }

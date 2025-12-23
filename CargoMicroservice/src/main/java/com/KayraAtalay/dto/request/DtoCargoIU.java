@@ -19,6 +19,6 @@ public class DtoCargoIU {
     private String receiverEmail;
 
     @NotNull
-    private String receiverAddress;
+    private String deliveryAddress;
 
 }

@@ -10,6 +10,8 @@ import java.util.Optional;
 @Repository
 public interface CargoRepository extends JpaRepository<Cargo, Long> {
     Optional<Cargo> findByTrackingNumber(String trackingNumber);
-    boolean existsByIdAndDeliveryCode(Long cargoId, Integer deliveryCode);
     List<Cargo> findAllBySenderId(Long senderId);
+    boolean existsByTrackingNumberAndCreatedCode(String trackingNumber, Integer createdCode);
+    boolean existsByTrackingNumberAndDeliveryCode(String trackingNumber, Integer deliveryCode);
+    boolean existsByIdAndSenderId(Long id, Long senderId);
 }

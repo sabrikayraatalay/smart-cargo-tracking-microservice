@@ -20,4 +20,7 @@ public interface IRestAuthenticationController {
 
     public RootEntity<Long> findUserIdByUsername(Principal principal);
 
+    public RootEntity<String> findUserEmailByUsername(Principal principal);
+
+
 }

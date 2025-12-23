@@ -10,4 +10,7 @@ public interface UserManager {
 
     @GetMapping("/find-user-id-by-username")
     public RootEntity<Long> findUserIdByUsername();
+
+    @GetMapping("/find-user-email-by-username")
+    RootEntity<String> findUserEmailByUsername();
 }
