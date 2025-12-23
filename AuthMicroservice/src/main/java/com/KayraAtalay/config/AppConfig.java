@@ -41,7 +41,7 @@ public class AppConfig {
                 Optional<User> optional = userRepository.findByUsername(username);
 
                 if (optional.isEmpty()) {
-                    throw new BaseException(new ErrorMessage(MessageType.USERNAME_NOT_FOUND, " : " + username));
+                    throw new BaseException(new ErrorMessage(MessageType.USER_NOT_FOUND,  username));
                 }
                 return optional.get();
             }

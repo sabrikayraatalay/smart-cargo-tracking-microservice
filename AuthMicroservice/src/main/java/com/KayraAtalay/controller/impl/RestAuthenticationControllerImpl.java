@@ -1,8 +1,10 @@
 package com.KayraAtalay.controller.impl;
 
 import com.KayraAtalay.dto.request.AuthRequest;
+import com.KayraAtalay.dto.request.CourierRegisterRequest;
 import com.KayraAtalay.dto.request.RefreshTokenRequest;
 import com.KayraAtalay.dto.response.AuthResponse;
+import com.KayraAtalay.dto.response.CourierResponse;
 import com.KayraAtalay.dto.response.DtoUser;
 import com.KayraAtalay.shared.response.RestBaseController;
 import com.KayraAtalay.shared.response.RootEntity;
@@ -37,7 +39,7 @@ public class RestAuthenticationControllerImpl extends RestBaseController impleme
     @PostMapping(REGISTER_COURIER)
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public RootEntity<DtoUser> registerCourier(@Valid @RequestBody AuthRequest request) {
+    public RootEntity<CourierResponse> registerCourier(@Valid @RequestBody CourierRegisterRequest request) {
         return ok(authenticationService.registerCourier(request));
     }
 

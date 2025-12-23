@@ -67,8 +67,8 @@ public class CargoServiceImpl implements ICargoService {
         NotificationMessage message = new NotificationMessage();
         message.setTrackingNumber(cargo.getTrackingNumber());
         message.setReceiverEmail(cargo.getSenderEmail());
-        message.setReceiverName(cargo.getReceiverName());
-        message.setDeliveryCode(cargo.getDeliveryCode());
+        message.setReceiverName("Dear Customer");
+        message.setDeliveryCode(cargo.getCreatedCode());
 
         message.setMessageType(messageType);
 
@@ -130,6 +130,7 @@ public class CargoServiceImpl implements ICargoService {
 
         cargo.setStatus(CargoStatus.CANCELLED);
         Cargo savedCargo = cargoRepository.save(cargo);
+        sendNotificationToQueueForCreatedCode(savedCargo, "CARGO_CANCELLED");
 
         return DtoConverter.toDtoCargo(savedCargo);
     }
@@ -172,7 +173,7 @@ public class CargoServiceImpl implements ICargoService {
         cargo.setStatus(CargoStatus.RECEIVED);
 
         Cargo savedCargo = cargoRepository.save(cargo);
-        sendNotificationToQueue(savedCargo,"Cargo_RECEIVED");
+        sendNotificationToQueue(savedCargo,"CARGO_RECEIVED");
 
         return DtoConverter.toDtoCargo(savedCargo);
 
@@ -195,7 +196,7 @@ public class CargoServiceImpl implements ICargoService {
         cargo.setStatus(CargoStatus.DELIVERED);
         Cargo savedCargo = cargoRepository.save(cargo);
 
-        sendNotificationToQueue(savedCargo,"Cargo_DELIVERED");
+        sendNotificationToQueue(savedCargo,"CARGO_DELIVERED");
 
         return DtoConverter.toDtoCargo(savedCargo);
     }

@@ -5,8 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.KayraAtalay.dto.request.AuthRequest;
+import com.KayraAtalay.dto.request.CourierRegisterRequest;
 import com.KayraAtalay.dto.request.RefreshTokenRequest;
 import com.KayraAtalay.dto.response.AuthResponse;
+import com.KayraAtalay.dto.response.CourierResponse;
 import com.KayraAtalay.dto.response.DtoUser;
 import com.KayraAtalay.shared.enums.UserRole;
 import com.KayraAtalay.shared.exception.BaseException;
@@ -48,11 +50,11 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private RefreshTokenRepository refreshTokenRepository;
 
 
-    private User createCourier(AuthRequest request) {
+    private User createCourier(CourierRegisterRequest request) {
 
         User user = new User();
         user.setCreateTime(new Date());
-        user.setUsername(request.getUsername());
+        user.setUsername(request.getFullName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(UserRole.COURIER);
 
@@ -105,19 +107,21 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     @Override
-    public DtoUser registerCourier(AuthRequest request) {
-        Optional<User> optional = userRepository.findByUsername(request.getUsername());
+    public CourierResponse registerCourier(CourierRegisterRequest request) {
+        Optional<User> optional = userRepository.findByUsername(request.getFullName());
 
         if (optional.isPresent()) {
-            throw new BaseException(new ErrorMessage(MessageType.USER_ALREADY_EXISTS, request.getUsername()));
+            throw new BaseException(new ErrorMessage(MessageType.USER_ALREADY_EXISTS, request.getFullName()));
         }
 
         User savedUser = userRepository.save(createCourier(request));
-        DtoUser dtoUser = new DtoUser();
-        BeanUtils.copyProperties(savedUser, dtoUser);
+      CourierResponse courierResponse = new CourierResponse();
+        BeanUtils.copyProperties(savedUser, courierResponse);
+        courierResponse.setFullName(savedUser.getUsername());
+        courierResponse.setPhoneNumber(request.getPhoneNumber());
 
 
-        return dtoUser;
+        return courierResponse;
     }
 
     @Override

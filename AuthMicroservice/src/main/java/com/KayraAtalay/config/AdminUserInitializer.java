@@ -25,7 +25,7 @@ public class AdminUserInitializer implements CommandLineRunner {
         if (!userRepository.findByUsername("admin").isPresent()) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setPassword(passwordEncoder.encode("Admin123123"));
             admin.setCreateTime(new Date());
             admin.setRole(UserRole.ADMIN);
 

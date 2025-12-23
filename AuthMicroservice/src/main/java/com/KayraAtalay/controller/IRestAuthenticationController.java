@@ -1,8 +1,10 @@
 package com.KayraAtalay.controller;
 
 import com.KayraAtalay.dto.request.AuthRequest;
+import com.KayraAtalay.dto.request.CourierRegisterRequest;
 import com.KayraAtalay.dto.request.RefreshTokenRequest;
 import com.KayraAtalay.dto.response.AuthResponse;
+import com.KayraAtalay.dto.response.CourierResponse;
 import com.KayraAtalay.dto.response.DtoUser;
 import com.KayraAtalay.shared.response.RootEntity;
 
@@ -12,7 +14,7 @@ public interface IRestAuthenticationController {
 
     public RootEntity<DtoUser> register(AuthRequest request);
 
-    public RootEntity<DtoUser> registerCourier(AuthRequest request);
+    public RootEntity<CourierResponse> registerCourier(CourierRegisterRequest request);
 
     public RootEntity<AuthResponse> authenticate(AuthRequest request);
 

@@ -1,7 +1,7 @@
 package com.KayraAtalay.dto.response;
 
-import com.KayraAtalay.enums.CargoStatus;
 import com.KayraAtalay.shared.dto.DtoBase;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -10,12 +10,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class DtoCargo extends DtoBase {
-
-    private String trackingNumber;
-
-    private String receiverName;
-
-    private CargoStatus status;
-
+public class CourierResponse extends DtoBase {
+    private String fullName;
+    @Email
+    private String email;
+    private String phoneNumber;
 }
